@@ -1,11 +1,12 @@
 {
   "name": "mestre-rpg-dnd",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "type": "module",
   "description": "Criador de fichas de D&D 5e (SRD 5.2) e apoio ao Mestre",
   "scripts": {
     "test": "node --test tests/*.test.mjs",
-    "serve": "python -m http.server 8123"
+    "serve": "python -m http.server 8123",
+    "glossario": "node scripts/glossario.mjs"
   }
 }

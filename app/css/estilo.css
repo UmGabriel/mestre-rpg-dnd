@@ -1,4 +1,4 @@
-/* Estilo pergaminho, inspirado em design/ficha-ui/Ficha de RPG.jpg */
+/* Estilo pergaminho com tipografia de documento: serifa no texto, sem serifa de formulário nos rótulos. */
 :root {
   --papel: #efe3c8;
   --papel-2: #e6d6b3;
@@ -9,8 +9,9 @@
   --ouro: #a67c2e;
   --vermelho: #8e2a1f;
   --verde: #4f6b3c;
-  --titulo: 'Cinzel', 'Trajan Pro', Georgia, serif;
-  --texto: 'EB Garamond', Garamond, Georgia, serif;
+  --titulo: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+  --texto: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+  --rotulo: 'Source Sans 3', 'Segoe UI', Arial, sans-serif;
 }
 
 * { box-sizing: border-box; }
@@ -19,8 +20,8 @@ body {
   margin: 0;
   color: var(--tinta);
   font-family: var(--texto);
-  font-size: 17px;
-  line-height: 1.4;
+  font-size: 16px;
+  line-height: 1.45;
   background:
     radial-gradient(ellipse at 20% 10%, rgba(255, 250, 235, .55), transparent 60%),
     radial-gradient(ellipse at 80% 90%, rgba(120, 85, 40, .25), transparent 55%),
@@ -28,7 +29,8 @@ body {
   min-height: 100vh;
 }
 button { font: inherit; color: inherit; }
-h1, h2, h3, h4 { font-family: var(--titulo); font-weight: 700; margin: 0; letter-spacing: .02em; }
+h1, h2, h3, h4 { font-family: var(--titulo); font-weight: 700; margin: 0; }
+h4 { font-family: var(--rotulo); font-weight: 700; text-transform: uppercase; letter-spacing: .06em; }
 small { color: var(--tinta-suave); }
 code { font-size: .9em; background: rgba(90, 67, 48, .12); padding: 0 .3em; border-radius: 3px; }
 
@@ -54,7 +56,7 @@ code { font-size: .9em; background: rgba(90, 67, 48, .12); padding: 0 .3em; bord
 .passo:hover { background: rgba(243, 230, 200, .15); }
 .passo-num {
   display: inline-grid; place-items: center; width: 1.5rem; height: 1.5rem; border-radius: 50%;
-  border: 1px solid currentColor; font-family: var(--titulo); font-size: .8rem;
+  border: 1px solid currentColor; font-family: var(--rotulo); font-size: .8rem;
 }
 .passo.ok .passo-num { background: var(--verde); border-color: var(--verde); color: #fff; }
 .passo.on { background: var(--papel); color: var(--tinta); border-color: var(--papel); }
@@ -79,15 +81,15 @@ code { font-size: .9em; background: rgba(90, 67, 48, .12); padding: 0 .3em; bord
   display: inline-grid; place-items: center; width: 2.1rem; height: 2.1rem; border-radius: 50%;
   border: 2px solid var(--borda); font-size: 1rem;
 }
-.mestre h4 { font-size: 1rem; margin: 1.2rem 0 .5rem; border-bottom: 1px solid var(--papel-escuro); padding-bottom: .2rem; }
+.mestre h4 { font-size: .8rem; margin: 1.2rem 0 .5rem; border-bottom: 1px solid var(--papel-escuro); padding-bottom: .2rem; }
 
 .fala {
   position: relative; background: rgba(255, 252, 240, .55); border-left: 4px solid var(--ouro);
-  padding: .7rem 1rem .5rem; margin-bottom: 1rem; border-radius: 0 6px 6px 0; font-style: italic;
+  padding: .7rem 1rem .5rem; margin-bottom: 1rem; border-radius: 0 6px 6px 0;
 }
 .fala p { margin: 0 0 .5rem; }
-.fala-quem { display: block; font-family: var(--titulo); font-style: normal; font-size: .75rem; color: var(--ouro); letter-spacing: .1em; text-transform: uppercase; margin-bottom: .2rem; }
-.fala ul { margin: .2rem 0 .6rem; font-style: normal; }
+.fala-quem { display: block; font-family: var(--rotulo); font-weight: 700; font-size: .72rem; color: var(--ouro); letter-spacing: .1em; text-transform: uppercase; margin-bottom: .2rem; }
+.fala ul { margin: .2rem 0 .6rem; }
 
 /* ---------------------------------------------------------------- formulários */
 .form { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: .6rem .9rem; margin: .6rem 0; }
@@ -118,7 +120,7 @@ textarea { resize: vertical; }
 /* ---------------------------------------------------------------- botões e cartões */
 .btn {
   background: var(--vermelho); color: #fbf1dc; border: 1px solid #5e1b13; border-radius: 4px;
-  padding: .5rem 1rem; cursor: pointer; font-family: var(--titulo); font-size: .9rem; letter-spacing: .03em;
+  padding: .5rem 1rem; cursor: pointer; font-family: var(--rotulo); font-weight: 600; font-size: .9rem; letter-spacing: .03em;
   box-shadow: 0 2px 0 #5e1b13;
 }
 .btn:hover { filter: brightness(1.1); }
@@ -148,7 +150,7 @@ textarea { resize: vertical; }
 .cartao.rec { border-style: dashed; border-color: var(--ouro); }
 .cartao.on.rec { border-style: solid; border-color: var(--vermelho); }
 .cartao-titulo { font-family: var(--titulo); font-weight: 700; font-size: 1rem; }
-.cartao-titulo em { font-family: var(--texto); font-weight: 400; font-size: .75rem; color: var(--ouro); margin-left: .3rem; }
+.cartao-titulo em { font-family: var(--rotulo); font-style: normal; font-weight: 400; font-size: .72rem; color: var(--ouro); margin-left: .3rem; }
 .cartao-corpo small { display: inline-block; margin-top: .25rem; }
 
 .detalhe { margin-top: 1rem; padding: .8rem 1rem; border: 1px solid var(--papel-escuro); border-radius: 6px; background: rgba(255, 252, 242, .45); }
@@ -162,7 +164,7 @@ textarea { resize: vertical; }
   display: flex; flex-direction: column; align-items: center; gap: .3rem; padding: .5rem;
   border: 1px solid var(--papel-escuro); border-radius: 6px; background: rgba(255, 252, 242, .5);
 }
-.rolagem b { font-family: var(--titulo); font-size: 1.4rem; }
+.rolagem b { font-family: var(--rotulo); font-size: 1.4rem; }
 .rolagem input { width: 5rem; text-align: center; }
 .dados { display: flex; gap: .25rem; }
 .dado {
@@ -178,22 +180,22 @@ textarea { resize: vertical; }
 .atrib-grade label { display: flex; flex-direction: column; font-size: .9rem; }
 .compra { display: grid; gap: .35rem; margin: .5rem 0; }
 .compra-linha { display: grid; grid-template-columns: 8rem auto 2.2rem auto 1fr; align-items: center; gap: .5rem; }
-.compra-linha b { text-align: center; font-family: var(--titulo); font-size: 1.2rem; }
-.pontos b { font-family: var(--titulo); font-size: 1.2rem; }
+.compra-linha b { text-align: center; font-family: var(--rotulo); font-size: 1.2rem; }
+.pontos b { font-family: var(--rotulo); font-size: 1.2rem; }
 .erro, .pontos.erro b { color: var(--vermelho); }
 
 .tabela { width: 100%; border-collapse: collapse; font-size: .92rem; margin: .5rem 0; }
-.tabela th { font-family: var(--titulo); font-size: .75rem; text-align: left; border-bottom: 1.5px solid var(--borda); padding: .2rem .3rem; }
+.tabela th { font-family: var(--rotulo); font-size: .72rem; text-transform: uppercase; letter-spacing: .04em; text-align: left; border-bottom: 1.5px solid var(--borda); padding: .2rem .3rem; }
 .tabela td { border-bottom: 1px dotted var(--papel-escuro); padding: .25rem .3rem; vertical-align: top; }
 .tabela-atr th, .tabela-atr td { text-align: center; }
 .tabela-atr td:first-child { text-align: left; }
 .tabela .forte td { font-weight: 700; }
-.contas td.num { font-family: var(--titulo); font-weight: 700; font-size: 1.15rem; text-align: center; white-space: nowrap; }
+.contas td.num { font-family: var(--rotulo); font-weight: 700; font-size: 1.15rem; text-align: center; white-space: nowrap; }
 
 .loja { display: flex; gap: .4rem; align-items: center; margin: .5rem 0; }
 .loja select { flex: 1; }
 .compras { margin: .3rem 0; padding-left: 1.1rem; }
-.ouro b { font-family: var(--titulo); }
+.ouro b { font-family: var(--rotulo); }
 
 .avisos, .pend-passo {
   margin-top: 1rem; padding: .6rem .8rem; border-radius: 6px; font-size: .92rem;
@@ -231,13 +233,13 @@ textarea { resize: vertical; }
 .c1::after { top: 2px; left: 4px; } .c2::after { top: 2px; right: 4px; } .c3::after { bottom: 2px; left: 4px; } .c4::after { bottom: 2px; right: 4px; }
 
 .ficha-cabeca { display: grid; grid-template-columns: 1fr 180px; gap: 1.2rem; margin-bottom: 1rem; }
-.campo-grande { display: flex; align-items: baseline; gap: .5rem; font-family: var(--titulo); font-size: 1.05rem; font-variant: small-caps; margin-bottom: .5rem; }
+.campo-grande { display: flex; align-items: baseline; gap: .5rem; font-family: var(--rotulo); font-size: .78rem; text-transform: uppercase; letter-spacing: .06em; margin-bottom: .5rem; }
 .campo-grande span { white-space: nowrap; font-weight: 700; }
-.campo-grande b { flex: 1; border-bottom: 1.5px solid var(--borda); font-family: var(--texto); font-variant: normal; font-size: 1.15rem; font-weight: 600; padding-left: .3rem; min-height: 1.5em; }
+.campo-grande b { flex: 1; border-bottom: 1.5px solid var(--borda); font-family: var(--texto); text-transform: none; letter-spacing: 0; font-size: 1.15rem; font-weight: 600; padding-left: .3rem; min-height: 1.5em; }
 .ornamento { text-align: center; color: var(--borda); letter-spacing: 1em; border-top: 1px solid var(--borda); margin: .2rem 0 .5rem; line-height: 1; font-size: .9rem; }
 .ident-grade { display: grid; grid-template-columns: 1fr 1fr; gap: .2rem 1rem; }
 .campo-linha { display: flex; gap: .4rem; font-size: .9rem; align-items: baseline; }
-.campo-linha span { color: var(--tinta-suave); white-space: nowrap; font-variant: small-caps; }
+.campo-linha span { color: var(--tinta-suave); white-space: nowrap; font-family: var(--rotulo); font-size: .72rem; text-transform: uppercase; letter-spacing: .05em; }
 .campo-linha b { flex: 1; border-bottom: 1px dotted var(--borda); font-weight: 600; }
 
 .retrato {
@@ -252,24 +254,24 @@ textarea { resize: vertical; }
 }
 .retrato-placa {
   position: absolute; left: 50%; bottom: 8px; transform: translateX(-50%); white-space: nowrap;
-  background: #e9dcc0; border: 1px solid #3d2c1e; font-family: var(--titulo); font-size: .62rem; padding: .1rem .5rem;
+  background: #e9dcc0; border: 1px solid #3d2c1e; font-family: var(--rotulo); font-size: .6rem; text-transform: uppercase; letter-spacing: .05em; padding: .1rem .5rem;
 }
 
 .painel {
   position: relative; border: 1.5px solid var(--borda); border-radius: 4px; padding: .7rem .8rem .6rem; margin-bottom: .8rem;
   background: rgba(255, 252, 242, .25); box-shadow: inset 0 0 0 3px var(--papel), inset 0 0 0 4px rgba(90, 67, 48, .35);
 }
-.painel h3 { text-align: center; font-size: .95rem; margin-bottom: .5rem; font-variant: small-caps; }
+.painel h3 { text-align: center; font-family: var(--rotulo); font-size: .76rem; margin-bottom: .5rem; text-transform: uppercase; letter-spacing: .08em; }
 .painel p { margin: .2rem 0; font-size: .92rem; }
-.painel .vazio { color: var(--tinta-suave); font-style: italic; text-align: center; }
+.painel .vazio { color: var(--tinta-suave); text-align: center; }
 
 .marcas { display: grid; grid-template-columns: repeat(6, 1fr); gap: .3rem; }
 .marca { display: flex; flex-direction: column; align-items: center; text-align: center; gap: .15rem; }
-.marca-rotulo { font-family: var(--titulo); font-size: .62rem; font-weight: 700; line-height: 1.1; min-height: 2.2em; display: flex; align-items: end; }
+.marca-rotulo { font-family: var(--rotulo); font-size: .6rem; font-weight: 700; text-transform: uppercase; letter-spacing: .03em; line-height: 1.1; min-height: 2.2em; display: flex; align-items: end; }
 .marca-icone svg { width: 26px; height: 26px; }
 .marca-circulo {
   display: grid; place-items: center; width: 52px; height: 52px; border-radius: 50%; border: 2px solid var(--borda);
-  font-family: var(--titulo); font-weight: 700; font-size: 1.15rem; background: rgba(255, 252, 242, .5); box-shadow: inset 0 0 0 3px var(--papel);
+  font-family: var(--rotulo); font-weight: 700; font-size: 1.15rem; background: rgba(255, 252, 242, .5); box-shadow: inset 0 0 0 3px var(--papel);
 }
 .marca-extra { font-size: .68rem; color: var(--tinta-suave); line-height: 1.1; }
 
@@ -278,15 +280,15 @@ textarea { resize: vertical; }
   display: flex; flex-direction: column; align-items: center; border: 1.5px solid var(--borda); border-radius: 10px 10px 30px 30px;
   padding: .3rem .2rem .4rem; background: rgba(255, 252, 242, .4);
 }
-.atributo-nome { font-family: var(--titulo); font-size: .62rem; font-weight: 700; }
-.atributo-mod { font-family: var(--titulo); font-size: 1.5rem; font-weight: 700; line-height: 1.1; }
-.atributo-valor { display: grid; place-items: center; min-width: 2.2rem; height: 1.6rem; border: 1.5px solid var(--borda); border-radius: 50%; font-weight: 600; background: var(--papel); }
+.atributo-nome { font-family: var(--rotulo); font-size: .6rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
+.atributo-mod { font-family: var(--rotulo); font-size: 1.5rem; font-weight: 700; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.atributo-valor { display: grid; place-items: center; min-width: 2.2rem; height: 1.6rem; border: 1.5px solid var(--borda); border-radius: 50%; font-family: var(--rotulo); font-weight: 600; background: var(--papel); }
 .atributo-salv { font-size: .68rem; color: var(--tinta-suave); margin-top: .2rem; }
 .atributo-salv.on { color: var(--tinta); font-weight: 600; }
 
 .ficha-meio { display: grid; grid-template-columns: minmax(200px, .85fr) 1.4fr; gap: .8rem; }
 .pericias { list-style: none; margin: 0; padding: 0; font-size: .9rem; }
-.pericias li { display: flex; align-items: center; gap: .35rem; padding: .08rem 0; color: var(--tinta-suave); }
+.pericias li { display: flex; align-items: center; gap: .35rem; padding: .08rem 0; color: var(--tinta-suave); font-variant-numeric: tabular-nums; }
 .pericias li.on { color: var(--tinta); font-weight: 600; }
 .pericias .nome { white-space: nowrap; }
 .pericias .nome small { font-weight: 400; font-size: .7rem; }
@@ -297,12 +299,12 @@ textarea { resize: vertical; }
 
 .magia-topo { display: grid; grid-template-columns: repeat(4, 1fr); gap: .3rem; text-align: center; margin-bottom: .4rem; }
 .magia-topo div { border: 1px solid var(--papel-escuro); border-radius: 4px; padding: .1rem; }
-.magia-topo small { display: block; font-size: .65rem; font-family: var(--titulo); }
-.magia-topo b { font-family: var(--titulo); }
+.magia-topo small { display: block; font-size: .6rem; font-family: var(--rotulo); text-transform: uppercase; letter-spacing: .04em; }
+.magia-topo b { font-family: var(--rotulo); }
 
 .ficha-base { display: grid; grid-template-columns: 1fr 1fr; gap: .8rem; }
 .ficha-base .painel { min-height: 9rem; background-image: repeating-linear-gradient(transparent 0 1.55em, rgba(90, 67, 48, .18) 1.55em calc(1.55em + 1px)); }
-.moedas { text-align: right; font-family: var(--titulo); font-size: .85rem; }
+.moedas { text-align: right; font-family: var(--rotulo); font-size: .85rem; }
 .ficha-completa .lista-pequena li span { color: var(--tinta-suave); font-size: .88rem; }
 
 /* ---------------------------------------------------------------- telas menores */

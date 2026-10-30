@@ -1,9 +1,14 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  personagemNovo, calcular, modificador, custoCompra, rolar4d6, atributosFinais, pendencias, inventario,
+  personagemNovo, abrirFicha, calcular, modificador, custoCompra, rolar4d6, atributosFinais, pendencias, inventario,
 } from '../app/js/regras.js';
-import { CLASSES, ANTECEDENTES, ESPECIES, LISTAS_MAGIA, MAGIAS, ARMAS } from '../app/js/dados.js';
+import * as D from '../app/js/dados.js';
+import { readFileSync } from 'node:fs';
+import { ORDEM_PERICIAS_PDF } from '../app/js/exportar.js';
+import { gerarGlossario, ARQUIVO as GLOSSARIO } from '../scripts/glossario.mjs';
+
+const { CLASSES, ANTECEDENTES, ESPECIES, LISTAS_MAGIA, MAGIAS, ARMAS, PERICIAS } = D;
 
 function guerreiroAnao() {
   const p = personagemNovo();
@@ -17,7 +22,7 @@ function guerreiroAnao() {
   p.atributos.bonus = { modo: '2-1', mais2: 'for', mais1: 'con' };
   p.pericias.classe = ['percepcao', 'sobrevivencia'];
   p.idiomas = ['anao', 'gigante'];
-  p.detalhes.tendencia = 'Leal e Bom';
+  p.detalhes.tendencia = 'Ordeiro e Bom';
   return p;
 }
 
@@ -110,7 +115,7 @@ test('clérigo taumaturgo ganha truque extra e bônus em Religião', () => {
   const d = calcular(p);
   assert.equal(d.magia.limiteTruques, 4);
   assert.equal(d.pericias.find((s) => s.id === 'religiao').bonus, 0 + 2);
-  // Camisão de malha 13 + DES (−1) + escudo 2
+  // Cota de Malha Parcial 13 + DES (−1) + escudo 2
   assert.equal(d.ca.ca, 14);
 });
 
@@ -122,4 +127,34 @@ test('dados consistentes: listas de magia, armas dos kits e espécies', () => {
     for (const k of c.kits) for (const a of k.armas) assert.ok(ARMAS[a], `${id}: arma ${a} sem dados`);
   }
   for (const [id, e] of Object.entries(ESPECIES)) assert.ok(Array.isArray(e.tracos({})), id);
+});
+
+test('perícias em ordem alfabética na tela e todas na ordem da ficha PDF', () => {
+  const nomes = PERICIAS.map((s) => s.nome);
+  assert.deepEqual(nomes, [...nomes].sort((a, b) => a.localeCompare(b, 'pt-BR')));
+  assert.equal(PERICIAS.find((s) => s.id === 'adestrar').nome, 'Lidar com Animais');
+  assert.deepEqual([...ORDEM_PERICIAS_PDF].sort(), PERICIAS.map((s) => s.id).sort());
+});
+
+test('termos do Livro do Jogador 2024: nenhum nome de 2014 sobrou', () => {
+  const nomes = JSON.stringify(D, (k, v) => (typeof v === 'function' ? String(v) : v));
+  const antigos = ['Patrulheiro', 'Adestrar Animais', 'Rajada Mística', 'Marca do Caçador', 'Bruxaria', 'Globos de Luz',
+    'Toque Arrepiante', 'Pacote de', 'Leal e', 'Raspão', 'Atormentar', 'concussão', 'Camisão', 'Brunea', 'Golpe Desarmado',
+    'Agressor Selvagem', 'Retomar o Fôlego', 'Cura pelas Mãos', 'Inspiração Bárdica', 'Gnomo da Floresta', 'Sortudo'];
+  for (const t of antigos) assert.ok(!nomes.includes(`'${t}`) && !nomes.includes(`"${t}`), `ainda aparece: ${t}`);
+  assert.equal(CLASSES.patrulheiro.nome, 'Guardião');
+  assert.equal(ESPECIES.halfling.nome, 'Pequenino');
+  assert.equal(MAGIAS.hex.nome, 'Danação');
+});
+
+test('ficha salva na 0.1.0 abre com o alinhamento novo', () => {
+  const velha = { ...personagemNovo(), detalhes: { ...personagemNovo().detalhes, tendencia: 'Leal e Neutro' } };
+  assert.equal(abrirFicha(velha).detalhes.tendencia, 'Ordeiro e Neutro');
+  assert.equal(abrirFicha({ v: 1 }).detalhes.tendencia, '');
+  assert.ok(D.TENDENCIAS.includes(abrirFicha(velha).detalhes.tendencia));
+});
+
+test('glossário do Projeto está em dia com dados.js (rode npm run glossario)', () => {
+  const noDisco = readFileSync(GLOSSARIO, 'utf8').replace(/\r\n/g, '\n'); // checkout no Windows pode trazer CRLF
+  assert.equal(noDisco, gerarGlossario());
 });

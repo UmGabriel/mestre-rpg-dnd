@@ -6,7 +6,7 @@ import {
   LISTAS_INICIADO,
 } from './dados.js';
 import {
-  personagemNovo, calcular, pendencias, sinal, metros, custoCompra, valoresDisponiveis, rolar4d6,
+  personagemNovo, abrirFicha, calcular, pendencias, sinal, metros, custoCompra, valoresDisponiveis, rolar4d6,
   atributosDoAntecedente, bonusAntecedente, periciasFixas, periciasProficientes, fontesTalento, configTalento,
   infoMagia, truquesEspecie, proficienteComArma, moedas,
 } from './regras.js';
@@ -21,7 +21,7 @@ let p = carregar();
 function carregar() {
   try {
     const salvo = JSON.parse(localStorage.getItem(CHAVE));
-    if (salvo?.v === 1) return { ...personagemNovo(), ...salvo };
+    if (salvo?.v === 1) return abrirFicha(salvo);
   } catch { /* ficha corrompida: começa do zero */ }
   return personagemNovo();
 }
@@ -55,6 +55,14 @@ function toast(msg, ms = 3500) {
 const mestre = (html) => `<div class="fala"><span class="fala-quem">O Mestre diz</span>${html}</div>`;
 const opcoesSelect = (pares, atual, vazio = 'Escolha…') =>
   `<option value="">${vazio}</option>` + pares.map(([v, t, dis]) => `<option value="${esc(v)}" ${String(atual) === String(v) ? 'selected' : ''} ${dis ? 'disabled' : ''}>${esc(t)}</option>`).join('');
+// Plural dos nomes de arma ("Adaga" → "Adagas", "Machado de Batalha" → "Machados de Batalha").
+const plural = (nome) => {
+  let parar = false;
+  return nome.split(' ').map((w) => {
+    if (parar || /^(de|da|do)$/.test(w)) { parar = true; return w; }
+    return /[aeiou]$/i.test(w) ? `${w}s` : w;
+  }).join(' ');
+};
 const nomeAtr = (id) => ATRIBUTOS.find((a) => a.id === id)?.nome || id;
 const nomePericia = (id) => PERICIAS.find((s) => s.id === id)?.nome || id;
 
@@ -107,14 +115,14 @@ function passoClasse() {
   const cls = CLASSES[p.classe.id];
   const rec = recomendadas();
   const itens = Object.entries(CLASSES).map(([id, c]) => [id, c.nome,
-    `${esc(c.resumo)}<br><small>Gosta de: ${c.gosta} · Atributo: ${c.primario.map(nomeAtr).join(' e ')} · Complexidade: ${c.complexidade} · d${c.dado}</small>`]);
+    `${esc(c.resumo)}<br><small>Interesse: ${c.gosta} · Atributo: ${c.primario.map(nomeAtr).join(' e ')} · Complexidade: ${c.complexidade} · d${c.dado}</small>`]);
   let detalhe = '';
   if (cls) {
     const op = cls.opcao;
     detalhe = `<div class="detalhe">
       <h4>${cls.nome} <small>(${cls.en})</small></h4>
       <ul class="lista-pequena">
-        <li><b>Dado de vida:</b> d${cls.dado} · <b>Salvaguardas:</b> ${cls.salvaguardas.map(nomeAtr).join(' e ')}</li>
+        <li><b>Dado de Ponto de Vida:</b> d${cls.dado} · <b>Salvaguardas:</b> ${cls.salvaguardas.map(nomeAtr).join(' e ')}</li>
         <li><b>Armaduras:</b> ${cls.armaduras.length ? cls.armaduras.join(', ').replace('media', 'média').replace('escudo', 'escudos') : 'nenhuma'}</li>
         <li><b>Perícias:</b> escolha ${cls.pericias.n} ${cls.pericias.de === 'todas' ? 'quaisquer' : `entre ${cls.pericias.de.map(nomePericia).join(', ')}`}</li>
         ${cls.caracteristicas.map((c) => `<li><b>${esc(c.nome)}:</b> ${esc(c.desc)}</li>`).join('')}
@@ -301,7 +309,7 @@ function passoPericias() {
           <label>Atributo de conjuração <select data-campo="${base}.atributo">${opcoesSelect([['int', 'Inteligência'], ['sab', 'Sabedoria'], ['car', 'Carisma']], c.atributo)}</select></label>
         </div>
         ${lista ? `<p>2 truques:</p>${checkLista(`${base}.truques`, magias.filter((id) => MAGIAS[id].nivel === 0).map((id) => [id, MAGIAS[id].nome]), { max: 2, descricao: (id) => MAGIAS[id].desc })}
-        <p>1 magia de 1º nível:</p>${checkLista(`${base}.magiaLista`, magias.filter((id) => MAGIAS[id].nivel === 1).map((id) => [id, MAGIAS[id].nome]), { max: 1, atual: c.magia ? [c.magia] : [], descricao: (id) => MAGIAS[id].desc })}` : ''}`);
+        <p>1 magia de 1º círculo:</p>${checkLista(`${base}.magiaLista`, magias.filter((id) => MAGIAS[id].nivel === 1).map((id) => [id, MAGIAS[id].nome]), { max: 1, atual: c.magia ? [c.magia] : [], descricao: (id) => MAGIAS[id].desc })}` : ''}`);
     }
     if (f.id === 'habilidoso') {
       const outras = new Set([...prof].filter((id) => !c.pericias.includes(id)));
@@ -337,7 +345,7 @@ function passoPericias() {
     if (k.escudo) partes.push('Escudo');
     const armas = {};
     k.armas.forEach((a) => (armas[a] = (armas[a] || 0) + 1));
-    Object.entries(armas).forEach(([a, n]) => partes.push(`${n > 1 ? n + ' ' : ''}${ARMAS[a].nome}`));
+    Object.entries(armas).forEach(([a, n]) => partes.push(n > 1 ? `${n} ${plural(ARMAS[a].nome)}` : ARMAS[a].nome));
     partes.push(...k.itens);
     partes.push(`${k.po} PO`);
     return partes.join(', ');
@@ -346,18 +354,19 @@ function passoPericias() {
     <span><b>Opção ${k.letra}:</b> ${esc(descKit(k))}</span></label>`).join('');
   const inv = calcular(p).inventario;
   const $ = moedas(inv.pc);
-  const loja = [
-    ...Object.entries(ARMAS).map(([id, a]) => [`arma:${id}`, `Arma · ${a.nome} (${a.custo / 100} PO)`]),
-    ...Object.entries(ARMADURAS).map(([id, a]) => [`armadura:${id}`, `Armadura · ${a.nome} (${a.custo / 100} PO)`]),
-    ['escudo:escudo', `Escudo (${ESCUDO.custo / 100} PO)`],
-    ...Object.entries(PACOTES).map(([id, a]) => [`pacote:${id}`, `Pacote · ${a.nome} (${a.custo / 100} PO)`]),
-  ];
+  // Preço na maior moeda exata, como no livro (5 PC, 2 PP, 15 PO).
+  const preco = (pc) => (pc % 100 === 0 ? `${pc / 100} PO` : pc % 10 === 0 ? `${pc / 10} PP` : `${pc} PC`);
+  const grupo = (rotulo, itens) => `<optgroup label="${rotulo}">${itens.map(([v, t]) => `<option value="${v}">${esc(t)}</option>`).join('')}</optgroup>`;
+  const loja = `<option value="">Comprar com o ouro…</option>`
+    + grupo('Armas', Object.entries(ARMAS).map(([id, a]) => [`arma:${id}`, `${a.nome} (${preco(a.custo)})`]))
+    + grupo('Armaduras e escudo', [...Object.entries(ARMADURAS).map(([id, a]) => [`armadura:${id}`, `${a.nome} (${preco(a.custo)})`]), ['escudo:escudo', `Escudo (${preco(ESCUDO.custo)})`]])
+    + grupo('Kits de equipamento', Object.entries(PACOTES).map(([id, a]) => [`pacote:${id}`, `${a.nome} (${preco(a.custo)})`]));
   const nomeCompra = (c) => (c.tipo === 'arma' ? ARMAS[c.id].nome : c.tipo === 'armadura' ? ARMADURAS[c.id].nome : c.tipo === 'escudo' ? 'Escudo' : PACOTES[c.id].nome);
   blocos.push(`<h4>Equipamento inicial</h4>
     <p><b>${cls.nome}:</b></p>${radiosKit('kitClasse', cls.kits, p.equipamento.kitClasse)}
     ${ant ? `<p><b>${ant.nome}:</b></p>${radiosKit('kitAntecedente', ant.kits, ant.personalizado ? 'B' : p.equipamento.kitAntecedente)}` : ''}
     <p class="ouro ${inv.pc < 0 ? 'erro' : ''}">Ouro disponível: <b>${$.negativo ? '−' : ''}${Math.abs($.po)} PO${$.pp ? ` ${$.pp} PP` : ''}${$.pc ? ` ${$.pc} PC` : ''}</b></p>
-    <div class="loja"><select id="loja-item">${opcoesSelect(loja, '', 'Comprar com o ouro…')}</select><button class="btn-pequeno" data-acao="comprar">Comprar</button></div>
+    <div class="loja"><select id="loja-item">${loja}</select><button class="btn-pequeno" data-acao="comprar">Comprar</button></div>
     ${p.equipamento.compras.length ? `<ul class="compras">${p.equipamento.compras.map((c, i) => `<li>${esc(nomeCompra(c))} <button class="btn-x" data-acao="devolver" data-indice="${i}" title="Devolver">×</button></li>`).join('')}</ul>` : ''}
     <div class="form"><label class="larga">Outros itens (um por linha) <textarea data-campo="equipamento.extras" rows="2">${esc(p.equipamento.extras)}</textarea></label></div>`);
 
@@ -372,10 +381,10 @@ function passoPericias() {
     blocos.push(`<h4>Magias de ${cls.nome} <small>· atributo ${nomeAtr(im.atr)}</small></h4>
       ${im.truques ? `<p>Truques <small>(escolha ${im.truques}; passe o mouse para ver o que fazem)</small>:</p>
         ${checkLista('magias.truques', truques.map((id) => [id, MAGIAS[id].nome]), { max: im.truques, desabilitados: deEspecie, descricao: (id) => MAGIAS[id].desc })}` : ''}
-      <p>Magias de 1º nível preparadas <small>(escolha ${im.preparadas}; C = concentração, R = ritual)</small>:</p>
+      <p>Magias de 1º círculo preparadas <small>(escolha ${im.preparadas}; C = concentração, R = ritual)</small>:</p>
       ${checkLista('magias.preparadas', nivel1.map((id) => [id, MAGIAS[id].nome, tag(id) ? `(${tag(id)})` : '']), { max: im.preparadas, descricao: (id) => MAGIAS[id].desc })}
       ${im.sempre ? `<p><small>Sempre preparada: ${im.sempre.map((id) => MAGIAS[id].nome).join(', ')}.</small></p>` : ''}
-      ${im.grimorio ? `<p><small>O grimório começa com ${im.grimorio} magias de 1º nível: as ${im.preparadas} preparadas e mais ${im.grimorio - im.preparadas}. Anote as outras em "Outros itens".</small></p>` : ''}`);
+      ${im.grimorio ? `<p><small>O Livro de Magias começa com ${im.grimorio} magias de 1º círculo: as ${im.preparadas} preparadas e mais ${im.grimorio - im.preparadas}. Anote as outras em "Outros itens".</small></p>` : ''}`);
   }
 
   return `${mestre(`<p>Hora dos detalhes do treinamento: <b>perícias</b>, <b>idiomas</b>, <b>equipamento</b>${im ? ' e <b>magias</b>' : ''}.</p>
@@ -390,7 +399,7 @@ function passoCombate() {
     ['Pontos de Vida', d.pvMax ?? '—', d.cls ? `d${d.cls.dado} no máximo (${d.cls.dado}) + CON (${m('con')})${d.esp?.pvPorNivel ? ' + 1 (Robustez Anã)' : ''}` : 'Escolha a classe.'],
     ['Classe de Armadura', d.ca.ca, d.ca.como],
     ['Iniciativa', sinal(d.iniciativa), `DES (${m('des')})${temAlerta ? ` + proficiência (${sinal(d.pb)}, talento Alerta)` : ''}`],
-    ['Bônus de proficiência', sinal(d.pb), 'Nível 1'],
+    ['Bônus de Proficiência', sinal(d.pb), 'Nível 1'],
     ['Percepção passiva', d.percepcaoPassiva, '10 + bônus de Percepção'],
     ['Deslocamento', d.deslocamento ? metros(d.deslocamento) : '—', d.esp ? d.esp.nome : ''],
   ];
@@ -399,7 +408,7 @@ function passoCombate() {
     linhas.push(['Ataque mágico', sinal(d.magia.ataque), `proficiência + ${nomeAtr(d.magia.atr)}`]);
   }
   return `${mestre(`<p>Com tudo escolhido, os números de combate saem sozinhos. Confira as contas abaixo, elas seguem o SRD.</p>
-    <p>No nível 1 o PV é sempre o máximo do dado de vida. Quer testar? Role uma iniciativa.</p>`)}
+    <p>No nível 1 o PV é sempre o máximo do Dado de Ponto de Vida. Quer testar? Role uma iniciativa.</p>`)}
     <table class="tabela contas"><tbody>${linhas.map(([a, b, c]) => `<tr><td>${a}</td><td class="num">${b}</td><td><small>${esc(c)}</small></td></tr>`).join('')}</tbody></table>
     <button class="btn" data-acao="rolar-teste" data-bonus="${d.iniciativa}" data-rotulo="Iniciativa">Rolar iniciativa (d20${sinal(d.iniciativa)})</button>
     <h4>Ataques</h4>
@@ -413,10 +422,10 @@ function passoDetalhes() {
   const dt = p.detalhes;
   const campo = (id, rotulo, ph = '') => `<label>${rotulo}<input data-campo="detalhes.${id}" value="${esc(dt[id])}" placeholder="${ph}"></label>`;
   const area = (id, rotulo, ph = '', rows = 3) => `<label class="larga">${rotulo}<textarea data-campo="detalhes.${id}" rows="${rows}" placeholder="${ph}">${esc(dt[id])}</textarea></label>`;
-  return `${mestre(`<p>Últimos toques: a <b>tendência</b>, a aparência e a personalidade. Essa parte é a que mais me ajuda a criar ganchos para a história.</p>
+  return `${mestre(`<p>Últimos toques: o <b>alinhamento</b>, a aparência e a personalidade. Essa parte é a que mais me ajuda a criar ganchos para a história.</p>
     <p>Algumas perguntas do SRD para inspirar: quem te criou? Qual era seu melhor amigo de infância? Você já se apaixonou? O que te faz partir em aventuras agora?</p>`)}
     <div class="form">
-      <label>Tendência <select data-campo="detalhes.tendencia">${opcoesSelect(TENDENCIAS.map((t) => [t, t]), dt.tendencia)}</select></label>
+      <label>Alinhamento <select data-campo="detalhes.tendencia">${opcoesSelect(TENDENCIAS.map((t) => [t, t]), dt.tendencia)}</select></label>
       ${campo('idade', 'Idade')}${campo('altura', 'Altura')}${campo('peso', 'Peso')}
       ${campo('olhos', 'Olhos')}${campo('pele', 'Pele')}${campo('cabelo', 'Cabelo')}
       ${area('aparencia', 'Aparência', 'Como os outros te veem à primeira vista')}
@@ -724,7 +733,7 @@ document.getElementById('arquivo-json').addEventListener('change', async (ev) =>
   try {
     const dados = JSON.parse(await f.text());
     if (dados?.v !== 1) throw new Error('arquivo não é uma ficha deste app');
-    p = { ...personagemNovo(), ...dados };
+    p = abrirFicha(dados);
     render();
     toast(`Ficha de <b>${esc(p.conceito.nome || 'personagem')}</b> carregada.`);
   } catch (e) {

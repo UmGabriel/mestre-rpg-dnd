@@ -1,6 +1,12 @@
 // Exportação da ficha: Markdown (modelo personagens/_modelo-ficha.md), JSON e PDF (regras/ficha/FICHA_MODEL.pdf).
-import { ATRIBUTOS, MAGIAS, MAESTRIAS, ARMADURAS, ESCUDO, PERICIAS } from './dados.js';
+import { ATRIBUTOS, MAGIAS, MAESTRIAS, ARMADURAS, ESCUDO } from './dados.js';
 import { sinal, metros, agrupar } from './regras.js';
+
+// Ordem das linhas de perícia impressas na FICHA_MODEL.pdf (edição de 2014: "Adestrar Animais" é a 2ª linha).
+export const ORDEM_PERICIAS_PDF = [
+  'acrobacia', 'adestrar', 'arcanismo', 'atletismo', 'atuacao', 'enganacao', 'furtividade', 'historia', 'intimidacao',
+  'intuicao', 'investigacao', 'medicina', 'natureza', 'percepcao', 'persuasao', 'prestidigitacao', 'religiao', 'sobrevivencia',
+];
 
 export function baixar(nome, conteudo, tipo) {
   const url = URL.createObjectURL(new Blob([conteudo], { type: tipo }));
@@ -50,11 +56,11 @@ ${ATRIBUTOS.map((a) => {
     return `| ${a.nome} | ${v(d.atr[a.id])} | ${d.atr[a.id] == null ? '—' : sinal(d.mods[a.id])} | ${sinal(s.bonus)}${s.prof ? ' (prof.)' : ''} |`;
   }).join('\n')}
 
-**Bônus de proficiência:** ${sinal(d.pb)} · **Iniciativa:** ${sinal(d.iniciativa)} · **Percepção passiva:** ${d.percepcaoPassiva}
+**Bônus de Proficiência:** ${sinal(d.pb)} · **Iniciativa:** ${sinal(d.iniciativa)} · **Percepção passiva:** ${d.percepcaoPassiva}
 
 ## Combate
 **PV máx.:** ${v(d.pvMax)} · **PV atuais:** ${v(d.pvMax)} · **PV temporários:** 0
-**Dados de vida:** ${v(d.dadoVida)} · **CA:** ${d.ca.ca} (${d.ca.como}) · **Condições:** nenhuma
+**Dados de Vida:** ${v(d.dadoVida)} · **CA:** ${d.ca.ca} (${d.ca.como}) · **Condições:** nenhuma
 
 | Ataque | Bônus | Dano | Propriedades |
 |---|---|---|---|
@@ -70,7 +76,7 @@ ${d.pericias.filter((s) => s.prof).map((s) => `- ${s.nome} ${sinal(s.bonus)}${s.
 
 ## Magia (se houver)
 ${m ? `**Atributo:** ${ATRIBUTOS.find((a) => a.id === m.atr).nome} · **CD:** ${m.cd} · **Ataque:** ${sinal(m.ataque)}
-**Espaços:** 1º ${'☐'.repeat(m.espacos[0])}${m.pacto ? ' (Magia de Pacto: voltam no descanso curto)' : ''}` : '**Atributo:** — · **CD:** — · **Ataque:** —'}
+**Espaços:** 1º ${'☐'.repeat(m.espacos[0])}${m.pacto ? ' (Magia de Pacto: voltam no Descanso Curto)' : ''}` : '**Atributo:** — · **CD:** — · **Ataque:** —'}
 - Truques: ${truquesTodos.map(nomeMagia).join(', ') || '—'}
 - Preparadas: ${[...(m?.sempre || []).map((id) => `${nomeMagia(id)} (sempre)`), ...(m?.preparadas || []).map(nomeMagia), ...extras1.map((x) => `${nomeMagia(x.id)} (${x.origem})`)].join(', ') || '—'}
 
@@ -177,9 +183,9 @@ export async function exportarPDF(p, d, pedirArquivo) {
     if (s.prof) bolinha(p1, 116, ySalv[i]);
     escrever(p1, sinal(s.bonus), 131, ySalv[i] + 3, { tam: 8, alinhar: 'c' });
   });
-  PERICIAS.forEach((sk, i) => {
+  ORDEM_PERICIAS_PDF.forEach((id, i) => {
     const y = 323 + 13.97 * i;
-    const s = d.pericias.find((x) => x.id === sk.id);
+    const s = d.pericias.find((x) => x.id === id);
     if (s.prof) bolinha(p1, 116, y);
     if (s.especialista) p1.drawCircle({ x: 116, y: H - y, size: 4.2, borderColor: tinta, borderWidth: 0.8 });
     escrever(p1, sinal(s.bonus), 131, y + 3, { tam: 8, alinhar: 'c' });

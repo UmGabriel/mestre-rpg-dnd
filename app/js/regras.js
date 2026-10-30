@@ -41,6 +41,15 @@ export function personagemNovo() {
   };
 }
 
+// Junta uma ficha salva (localStorage ou JSON) ao estado novo.
+// Fichas da 0.1.0 usavam "Leal" no alinhamento; o Livro do Jogador 2024 em PT-BR usa "Ordeiro".
+export function abrirFicha(salvo) {
+  const ficha = { ...personagemNovo(), ...salvo };
+  const al = ficha.detalhes?.tendencia;
+  if (al?.startsWith('Leal')) ficha.detalhes = { ...ficha.detalhes, tendencia: al.replace('Leal', 'Ordeiro') };
+  return ficha;
+}
+
 // ---------------------------------------------------------------- Atributos
 
 export function custoCompra(base) {
@@ -316,12 +325,12 @@ export function calcular(p) {
       props: props.join(', '), maestria: temMaestria ? a.maestria : null,
     };
   });
-  // Golpe desarmado (sempre existe)
+  // Ataque Desarmado (sempre existe)
   if (cls?.artesMarciais) {
     const atrId = m('des') >= m('for') ? 'des' : 'for';
-    ataques.push({ id: 'desarmado', qtd: 1, nome: 'Golpe Desarmado', bonus: m(atrId) + pb, prof: true, atr: atrId, dano: `${cls.artesMarciais} ${sinal(m(atrId))} concussão`, props: 'Artes Marciais' });
+    ataques.push({ id: 'desarmado', qtd: 1, nome: 'Ataque Desarmado', bonus: m(atrId) + pb, prof: true, atr: atrId, dano: `${cls.artesMarciais} ${sinal(m(atrId))} contundente`, props: 'Artes Marciais' });
   } else {
-    ataques.push({ id: 'desarmado', qtd: 1, nome: 'Golpe Desarmado', bonus: m('for') + pb, prof: true, atr: 'for', dano: `${Math.max(0, 1 + m('for'))} concussão`, props: '' });
+    ataques.push({ id: 'desarmado', qtd: 1, nome: 'Ataque Desarmado', bonus: m('for') + pb, prof: true, atr: 'for', dano: `${Math.max(0, 1 + m('for'))} contundente`, props: '' });
   }
 
   // Magia
@@ -333,7 +342,7 @@ export function calcular(p) {
     if (f.id !== 'iniciado') continue;
     const c = configTalento(p, f.chave);
     for (const t of c.truques) magiasExtras.push({ id: t, origem: 'Iniciado em Magia', atr: c.atributo });
-    if (c.magia) magiasExtras.push({ id: c.magia, origem: 'Iniciado em Magia (1×/descanso longo sem espaço)', atr: c.atributo });
+    if (c.magia) magiasExtras.push({ id: c.magia, origem: 'Iniciado em Magia (1×/Descanso Longo sem espaço)', atr: c.atributo });
   }
   if (im) {
     const mod = m(im.atr);
@@ -473,6 +482,6 @@ export function pendencias(p) {
   if (new Set(iniciados).size !== iniciados.length) add(5, 'Iniciado em Magia repetido precisa de listas diferentes.');
   if (inventario(p).pc < 0) add(5, 'As compras passaram do ouro disponível.');
 
-  if (!p.detalhes.tendencia) add(7, 'Escolha a tendência.');
+  if (!p.detalhes.tendencia) add(7, 'Escolha o alinhamento.');
   return out;
 }

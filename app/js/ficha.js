@@ -62,7 +62,7 @@ export function renderFicha(p, d, { completa = false } = {}) {
       </div>
       ${m.limiteTruques ? `<p><b>Truques:</b> ${m.truques.map(nomeMagia).map(esc).join(', ') || '—'}</p>` : ''}
       <p><b>Preparadas:</b> ${[...m.sempre.map((id) => `${nomeMagia(id)} (sempre)`), ...m.preparadas.map(nomeMagia)].map(esc).join(', ') || '—'}</p>
-      ${m.pacto ? '<p><small>Magia de Pacto: espaços voltam no descanso curto.</small></p>' : ''}` : ''}
+      ${m.pacto ? '<p><small>Magia de Pacto: espaços voltam no Descanso Curto.</small></p>' : ''}` : ''}
       ${extras ? `<p><b>Outras magias:</b></p><ul class="lista-pequena">${extras}</ul>` : ''}
     </section>`;
   }
@@ -80,7 +80,7 @@ export function renderFicha(p, d, { completa = false } = {}) {
   const $ = d.moedas;
 
   const historia = [
-    p.conceito.ideia && `<p><i>${esc(p.conceito.ideia)}</i></p>`,
+    p.conceito.ideia && `<p>${esc(p.conceito.ideia)}</p>`,
     p.detalhes.historia && `<p>${esc(p.detalhes.historia)}</p>`,
     p.detalhes.tracos && `<p><b>Traços:</b> ${esc(p.detalhes.tracos)}</p>`,
     p.detalhes.ideais && `<p><b>Ideais:</b> ${esc(p.detalhes.ideais)}</p>`,
@@ -99,7 +99,7 @@ export function renderFicha(p, d, { completa = false } = {}) {
           ${linha('Classe e nível', classeNivel)}
           ${linha('Antecedente', d.ant?.nome)}
           ${linha('Espécie', d.esp?.nome)}
-          ${linha('Tendência', p.detalhes.tendencia)}
+          ${linha('Alinhamento', p.detalhes.tendencia)}
           ${linha('Tamanho', d.tamanho)}
           ${linha('XP', '0')}
         </div>
@@ -110,7 +110,7 @@ export function renderFicha(p, d, { completa = false } = {}) {
     <section class="painel painel-principal">
       <h3>Características principais</h3>
       <div class="marcas">
-        ${circulo('pv', 'Pontos de Vida', d.pvMax, d.dadoVida ? `Dado de vida ${d.dadoVida}` : '')}
+        ${circulo('pv', 'Pontos de Vida', d.pvMax, d.dadoVida ? `Dado de Vida ${d.dadoVida}` : '')}
         ${circulo('ca', 'Classe de Armadura', d.ca?.ca)}
         ${circulo('ini', 'Iniciativa', sinal(d.iniciativa))}
         ${circulo('desl', 'Deslocamento', d.deslocamento ? metros(d.deslocamento) : null)}
