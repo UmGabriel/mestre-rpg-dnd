@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mestre de D&amp;D · Criação de Ficha</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=EB+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 16 16%22%3E%3Ctext y=%2214%22 font-size=%2214%22%3E%E2%9C%A6%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="css/estilo.css">
+</head>
+<body>
+  <header class="topo">
+    <div class="topo-titulo">
+      <span class="topo-selo">✦</span>
+      <div>
+        <h1>Mestre de D&amp;D</h1>
+        <p>Criação de ficha · D&amp;D 5e (regras 2024 · SRD 5.2)</p>
+      </div>
+    </div>
+    <div class="topo-acoes">
+      <button class="btn-link" data-acao="carregar-json" title="Abrir uma ficha salva (.json)">Abrir ficha</button>
+      <button class="btn-link" data-acao="novo" title="Começar outro personagem">Novo personagem</button>
+    </div>
+  </header>
+
+  <nav class="passos" id="passos" aria-label="Etapas"></nav>
+
+  <main class="palco" id="palco">
+    <section class="mestre" id="mestre" aria-live="polite"></section>
+    <aside class="ficha-coluna" id="ficha-coluna"></aside>
+  </main>
+
+  <div class="toast" id="toast" role="status"></div>
+  <input type="file" id="arquivo-json" accept=".json,application/json" hidden>
+  <input type="file" id="arquivo-pdf" accept=".pdf,application/pdf" hidden>
+  <input type="file" id="arquivo-foto" accept="image/png,image/jpeg" hidden>
+
+  <footer class="rodape">
+    Inclui material do System Reference Document 5.2 (“SRD 5.2”) da Wizards of the Coast LLC, disponível em
+    dndbeyond.com/srd, licenciado sob Creative Commons Attribution 4.0 International.
+  </footer>
+
+  <script src="vendor/pdf-lib.min.js"></script>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

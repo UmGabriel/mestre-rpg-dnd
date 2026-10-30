@@ -1,0 +1,11 @@
+# PDFs de regras e a ficha modelo (direitos da Wizards; ficam só na máquina, ver regras/README.md)
+regras/**/*.pdf
+# Dependências e saídas locais
+node_modules/
+# Sistema
+Thumbs.db
+desktop.ini
+.DS_Store
+.vscode/
+# Imagem de referência baixada (autoria de terceiros): fica só na máquina
+design/ficha-ui/*.jpg
